@@ -42,6 +42,23 @@ const manualProviderCosts: ModelCostRow[] = [
             'google-ai-studio': { prompt_token: 0.000001, completion_token: 0.00002, audio_output: 0.00002 },
         },
     })),
+    // GPT Image 2 is served only on the image endpoints, so it is missing from the OpenRouter catalog.
+    // Standard OpenAI API rates, USD per token: https://developers.openai.com/api/docs/pricing
+    // Text input $5, image input $8, image output $30 per 1M. One cache-read rate covers both
+    // modalities, so cached images are billed at the cached text rate ($1.25 rather than $2).
+    // There is no text output, so the completion rate also prices output without a modality breakdown.
+    ...['gpt-image-2', 'gpt-image-2-2026-04-21'].map((model) => ({
+        model,
+        cost: {
+            default: {
+                prompt_token: 0.000005,
+                completion_token: 0.00003,
+                cache_read_token: 0.00000125,
+                image: 0.000008,
+                image_output: 0.00003,
+            },
+        },
+    })),
     // Other
     {
         model: 'deepseek-v3-fireworks',
